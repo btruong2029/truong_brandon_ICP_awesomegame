@@ -1,6 +1,7 @@
 import pygame as pg #imports pygame with shorthand of pg
 from settings import * #imports everything from settings.py
 from pygame.sprite import Sprite #imports Sprite class
+from utils import *
 
 from os import path #imports path to let us use our system's directory system
 
@@ -38,8 +39,11 @@ class Player(Sprite): #creates class Player
         self.groups = game.all_sprites #gets all of the sprite images
         Sprite.__init__(self, self.groups) #initializes Sprite
         self.game = game
+        self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png"))
         self.image = pg.Surface((TILESIZE, TILESIZE)) #gets character pixel size from settings.py
-        self.image.fill(WHITE) #fills the character white
+        self.image = self.spritesheet.get_image(0,0, TILESIZE, TILESIZE)
+        self.image.set_colorkey(BLACK)
+        # self.image.fill(WHITE)
         self.rect = self.image.get_rect() #draws rectangle for character
         self.hit_rect = PLAYER_HIT_RECT
         self.vel = vec(0,0)

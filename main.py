@@ -38,8 +38,6 @@ class Game: #initializing class Game
         self.all_sprites = pg.sprite.Group()
         self.all_walls = pg.sprite.Group()
         self.all_mobs = pg.sprite.Group()
-        self.wall = Wall(self, 2, 0) #puts self.cactus on top left corner
-        self.mob = Mob(self, 5, 0)
  
         for row, tiles in enumerate(self.map.data):
             for col, tile in enumerate(tiles):
@@ -52,7 +50,7 @@ class Game: #initializing class Game
         for row, tiles in enumerate(self.map.data):
             for col, tile in enumerate(tiles):
                 if tile == "P":
-                    Wall(self, col, row)
+                    Player(self, col, row)
 
     def run(self):
         self.playing = True
