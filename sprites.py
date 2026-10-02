@@ -78,7 +78,7 @@ class Player(Sprite):
     def animate(self):
         # use the time element to get now
         now = pg.time.get_ticks()
-        if now - self.last_update > 350:
+        if now - self.last_update > 150:
             self.last_update = now
             self.current_frame = (self.current_frame + 1) % len(self.idle_frames)
             bottom = self.rect.bottom
@@ -87,7 +87,12 @@ class Player(Sprite):
             self.rect.bottom = bottom
     def load_images(self):
         self.idle_frames = [self.spritesheet.get_image(0,0,TILESIZE, TILESIZE),
-                            self.spritesheet.get_image(TILESIZE,0,TILESIZE, TILESIZE)
+                            self.spritesheet.get_image(TILESIZE,0,TILESIZE, TILESIZE),
+                            self.spritesheet.get_image(TILESIZE*2,0,TILESIZE, TILESIZE),
+                            self.spritesheet.get_image(TILESIZE*3,0,TILESIZE, TILESIZE),
+                            self.spritesheet.get_image(TILESIZE*4,0,TILESIZE, TILESIZE),
+                            self.spritesheet.get_image(TILESIZE*5,0,TILESIZE, TILESIZE)
+                            
                             ]
     def update(self):
         self.get_keys()
@@ -124,8 +129,11 @@ class Mob(Sprite):
         self.groups = game.all_sprites, game.all_mobs
         Sprite.__init__(self, self.groups)
         self.game = game
+        self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png"))
+        self.load_images()
         self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image.fill(RED)
+        self.image = self.spritesheet.get_image(0,0,TILESIZE, TILESIZE)
+        self.image = pg.Surface((TILESIZE, TILESIZE))
         self.rect = self.image.get_rect()
         self.speed = 1
         self.vx, self.vy = 500,0
@@ -133,12 +141,31 @@ class Mob(Sprite):
         self.y = y*TILESIZE
         self.rect.x = self.x
         self.rect.y = self.y
-
+        self.last_update = 0
+        self.current_frame = 0
         print("mob initialized")
         print(self.rect.x)
         print(self.rect.y)
+    def animate(self):
+            # use the time element to get now
+            now = pg.time.get_ticks()
+            if now - self.last_update > 150:
+                self.last_update = now
+                self.current_frame = (self.current_frame + 1) % len(self.idle_frames)
+                bottom = self.rect.bottom
+                self.image = self.idle_frames[self.current_frame]
+                self.rect = self.image.get_rect()
+                self.rect.bottom = bottom
+    def load_images(self):
+        self.idle_frames = [self.spritesheet.get_image(TILESIZE*6,0,TILESIZE, TILESIZE),
+                            self.spritesheet.get_image(TILESIZE*7,0,TILESIZE, TILESIZE),
+                            self.spritesheet.get_image(TILESIZE*8,0,TILESIZE, TILESIZE)
+        ]
+                                    
+
         
     def update(self):
+        self.animate()
         # thanks pygame
         if self.rect.right > WIDTH or self.rect.x <0:
             self.speed*=-1
