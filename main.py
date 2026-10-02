@@ -30,7 +30,7 @@ class Game: #initializing class Game
         self.clock = pg.time.Clock()
     def load_data(self, map):
         self.game_dir = path.dirname(__file__)
-        self.img_dir = path.join(self.game_dir, 'ímages')
+        self.img_dir = path.join(self.game_dir, 'images')
         self.snd_dir = path.join(self.game_dir, 'audio')
         self.map = Map(path.join(self.game_dir, map))
     def new(self):
@@ -45,12 +45,11 @@ class Game: #initializing class Game
                     Wall(self, col, row)
                 if tile == 'M':
                     pass
-                # if tile == 'P':
-                #     Player(self, col, row)
         for row, tiles in enumerate(self.map.data):
             for col, tile in enumerate(tiles):
                 if tile == "P":
-                    Player(self, col, row)
+                    Player(self, 10, 10)
+                    
 
     def run(self):
         self.playing = True
