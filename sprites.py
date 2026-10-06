@@ -172,6 +172,6 @@ class Mob(Sprite):
             self.y += TILESIZE
         self.x += self.vx * self.game.dt * self.speed
         self.rect.x = self.x
-        # self.y += self.vy * self.game.dt * self.speed
+        self.y += self.vy * self.game.dt * self.speed
         self.rect.y = self.y
         
