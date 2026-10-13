@@ -70,7 +70,7 @@ class Player(Sprite):
             self.vel.x = PLAYER_SPEED
         if keys[pg.K_UP] or keys[pg.K_w]:
             self.vel.y = -PLAYER_SPEED
-        if keys[pg.K_LEFT] or keys[pg.K_s]:
+        if keys[pg.K_DOWN] or keys[pg.K_s]:
             self.vel.y = PLAYER_SPEED
         # check to see if player is moving diagonal
         if self.vel.x != 0 and self.vel.y != 0:
@@ -135,27 +135,54 @@ class Mob(Sprite):
         self.image = self.spritesheet.get_image(0,0,TILESIZE, TILESIZE)
         self.image = pg.Surface((TILESIZE, TILESIZE))
         self.rect = self.image.get_rect()
-        self.speed = 1
+        self.speed = 100
+        self.vel = vec(0,0)
+        self.pos = vec(x*TILESIZE,y*TILESIZE)
         self.vx, self.vy = 500,0
         self.x = x*TILESIZE
         self.y = y*TILESIZE
         self.rect.x = self.x
         self.rect.y = self.y
+        self.dir = "none"
         self.last_update = 0
         self.current_frame = 0
+        self.hit_rect = MOB_HIT_RECT
         print("mob initialized")
         print(self.rect.x)
         print(self.rect.y)
+
+
     def animate(self):
             # use the time element to get now
             now = pg.time.get_ticks()
-            if now - self.last_update > 150:
-                self.last_update = now
-                self.current_frame = (self.current_frame + 1) % len(self.idle_frames)
-                bottom = self.rect.bottom
-                self.image = self.idle_frames[self.current_frame]
-                self.rect = self.image.get_rect()
-                self.rect.bottom = bottom
+            if self.dir == "none":
+                if now - self.last_update > 350:
+                    self.last_update = now
+                    self.current_frame = (self.current_frame + 1) % len(self.idle_frames)
+                    bottom = self.rect.bottom
+                    self.image = self.idle_frames[self.current_frame]
+                    self.image.set_colorkey(BLACK)
+                    self.rect = self.image.get_rect()
+                    self.rect.bottom = bottom
+            elif self.dir == "right":
+                pass
+    def chase(self, obj):
+        if self.pos.x < obj.pos.x:
+            self.vel.x = self.speed
+            self.dir = "right"
+        elif self.pos.x > obj.pos.x:
+            self.vel.x = -self.speed
+            self.dir = "left"
+        else:
+            self.vel.x = 0
+
+        if self.pos.y < obj.pos.y:
+            self.vel.y = self.speed
+        elif self.pos.y > obj.pos.y:
+            self.vel.y = -self.speed
+        else:
+            self.vel.y = 0
+
     def load_images(self):
         self.idle_frames = [self.spritesheet.get_image(TILESIZE*6,0,TILESIZE, TILESIZE),
                             self.spritesheet.get_image(TILESIZE*7,0,TILESIZE, TILESIZE),
@@ -166,12 +193,12 @@ class Mob(Sprite):
         
     def update(self):
         self.animate()
-        # thanks pygame
-        if self.rect.right > WIDTH or self.rect.x <0:
-            self.speed*=-1
-            self.y += TILESIZE
-        self.x += self.vx * self.game.dt * self.speed
-        self.rect.x = self.x
-        self.y += self.vy * self.game.dt * self.speed
-        self.rect.y = self.y
-        
+        if self.game.player:
+            self.chase(self.game.player)
+        self.rect.center = self.pos
+        self.pos += self.vel * self.game.dt
+        self.hit_rect.centerx = self.pos.x
+        collide_with_walls(self, self.game.all_walls, 'x')
+        self.hit_rect.centery = self.pos.y
+        collide_with_walls(self, self.game.all_walls, 'y')
+        self.rect.center = self.hit_rect.center

@@ -48,7 +48,7 @@ class Game: #initializing class Game
         for row, tiles in enumerate(self.map.data):
             for col, tile in enumerate(tiles):
                 if tile == "P":
-                    Player(self, col, row)
+                    self.player = Player(self, col, row)
                     
 
     def run(self):
@@ -74,7 +74,7 @@ class Game: #initializing class Game
 
     def draw_text(self,text,size,color,x,y):
         font_name = pg.font.match_font('arial')
-        font = pg.font.font(font_name, size)
+        font = pg.font.Font(font_name, size)
         text_surface = font.render(text, True, color)
         text_rect = text_surface.get_rect()
         text_rect.midtop = (x,y)
