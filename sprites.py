@@ -59,6 +59,7 @@ class Player(Sprite):
         self.current_frame = 0
         print('player instantiated')
         print(self.pos)
+        self.coins = 0
 
 # creates function for key presses so that the player can move. Up is negative player speed because 0,0 on the code is in the bottom left corner, so negative speed would make it go up.
     def get_keys(self):
@@ -86,16 +87,18 @@ class Player(Sprite):
             self.rect = self.image.get_rect()
             self.rect.bottom = bottom
     def load_images(self):
-        self.idle_frames = [self.spritesheet.get_image(0,0,TILESIZE, TILESIZE),
-                            self.spritesheet.get_image(TILESIZE,0,TILESIZE, TILESIZE),
-                            self.spritesheet.get_image(TILESIZE*2,0,TILESIZE, TILESIZE),
-                            self.spritesheet.get_image(TILESIZE*3,0,TILESIZE, TILESIZE),
-                            self.spritesheet.get_image(TILESIZE*4,0,TILESIZE, TILESIZE),
-                            self.spritesheet.get_image(TILESIZE*5,0,TILESIZE, TILESIZE)
+        self.idle_frames = [self.spritesheet.get_image(TILESIZE*13,0,TILESIZE, TILESIZE),
+                            self.spritesheet.get_image(TILESIZE*14,0,TILESIZE, TILESIZE),
+                            self.spritesheet.get_image(TILESIZE*15,0,TILESIZE, TILESIZE),
+                            self.spritesheet.get_image(TILESIZE*16,0,TILESIZE, TILESIZE),
+                            self.spritesheet.get_image(TILESIZE*17,0,TILESIZE, TILESIZE)
                             
                             ]
     def update(self):
         self.get_keys()
+        hits = pg.sprite.spritecollide(self, self.game.all_coins, True)
+        if hits:
+            self.coins += 1
         self.animate()
         self.rect.center = self.pos
         self.pos += self.vel * self.game.dt
@@ -161,11 +164,12 @@ class Mob(Sprite):
                     self.current_frame = (self.current_frame + 1) % len(self.idle_frames)
                     bottom = self.rect.bottom
                     self.image = self.idle_frames[self.current_frame]
-                    self.image.set_colorkey(BLACK)
+                    # self.image.set_colorkey(BLACK)
                     self.rect = self.image.get_rect()
                     self.rect.bottom = bottom
             elif self.dir == "right":
                 pass
+             
     def chase(self, obj):
         if self.pos.x < obj.pos.x:
             self.vel.x = self.speed
@@ -202,3 +206,24 @@ class Mob(Sprite):
         self.hit_rect.centery = self.pos.y
         collide_with_walls(self, self.game.all_walls, 'y')
         self.rect.center = self.hit_rect.center
+
+class Coin(Sprite):
+    def __init__(self, game, x, y):
+        self.groups = game.all_sprites, game.all_coins
+        Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.image.fill(BLACK)
+        pg.draw.circle(self.image, YELLOW, (16,16), 16)
+        self.rect = self.image.get_rect()
+        self.vx, self.vy = 0,0
+        self.x = x*TILESIZE
+        self.y = y*TILESIZE
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+    def load_images(self):
+        self.idle_frames = [self.spritesheet.get_image(0,0,TILESIZE, TILESIZE)
+                        ]
+
+    

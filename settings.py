@@ -11,6 +11,7 @@ WHITE = (255,255,255)
 GREEN = (0,120,0)
 RED = (255,0,0)
 BLACK = (0,0,0)
+YELLOW = (255, 255, 0)
 
 # Player settings
 PLAYER_SPEED = 300

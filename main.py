@@ -38,6 +38,7 @@ class Game: #initializing class Game
         self.all_sprites = pg.sprite.Group()
         self.all_walls = pg.sprite.Group()
         self.all_mobs = pg.sprite.Group()
+        self.all_coins = pg.sprite.Group()
  
         for row, tiles in enumerate(self.map.data):
             for col, tile in enumerate(tiles):
@@ -49,6 +50,10 @@ class Game: #initializing class Game
             for col, tile in enumerate(tiles):
                 if tile == "P":
                     self.player = Player(self, col, row)
+        for row, tiles in enumerate(self.map.data):
+            for col, tile in enumerate(tiles):
+                if tile == "C":
+                    Coin(self, col, row)
                     
 
     def run(self):
@@ -70,6 +75,7 @@ class Game: #initializing class Game
         self.screen.fill(BGCOLOR) #tells the code which color to fill the background
         self.all_sprites.draw(self.screen) #everything will be drawn on the screen
         self.draw_text("FPS:" + str(floor(1/self.dt)), 24, WHITE, WIDTH/2, HEIGHT/4)
+        self.draw_text(f"Coins:{self.player.coins}", 24, WHITE, WIDTH/2, HEIGHT/7)
         pg.display.flip()
 
     def draw_text(self,text,size,color,x,y):
