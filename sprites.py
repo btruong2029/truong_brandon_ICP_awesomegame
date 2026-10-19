@@ -59,7 +59,7 @@ class Player(Sprite):
         self.current_frame = 0
         print('player instantiated')
         print(self.pos)
-        self.coins = 0
+        self.coins = 0 # Coin counter variable
 
 # creates function for key presses so that the player can move. Up is negative player speed because 0,0 on the code is in the bottom left corner, so negative speed would make it go up.
     def get_keys(self):
@@ -98,7 +98,9 @@ class Player(Sprite):
         self.get_keys()
         hits = pg.sprite.spritecollide(self, self.game.all_coins, True)
         if hits:
+            # when picking up the coin, it adds to the coin counter and plays the pickup audio
             self.coins += 1
+            self.game.pickup_snd.play()
         self.animate()
         self.rect.center = self.pos
         self.pos += self.vel * self.game.dt
@@ -159,7 +161,7 @@ class Mob(Sprite):
             # use the time element to get now
             now = pg.time.get_ticks()
             if self.dir == "none":
-                if now - self.last_update > 350:
+                if now - self.last_update > 350: # changed to 350 so the animation is faster
                     self.last_update = now
                     self.current_frame = (self.current_frame + 1) % len(self.idle_frames)
                     bottom = self.rect.bottom
@@ -170,7 +172,7 @@ class Mob(Sprite):
             elif self.dir == "right":
                 pass
              
-    def chase(self, obj):
+    def chase(self, obj): 
         if self.pos.x < obj.pos.x:
             self.vel.x = self.speed
             self.dir = "right"
@@ -207,13 +209,14 @@ class Mob(Sprite):
         collide_with_walls(self, self.game.all_walls, 'y')
         self.rect.center = self.hit_rect.center
 
+
 class Coin(Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.all_coins
         Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image.fill(BLACK)
+        self.image.fill(BGCOLOR)
         pg.draw.circle(self.image, YELLOW, (16,16), 16)
         self.rect = self.image.get_rect()
         self.vx, self.vy = 0,0
