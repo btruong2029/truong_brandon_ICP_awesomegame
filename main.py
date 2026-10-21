@@ -17,7 +17,7 @@ from os import path
 from settings import * #imports everything from settings.py
 from sprites import * #imports everything from sprites.py
 from utils import *
- 
+
 class Game: #initializing class Game
     def __init__(self):
         pg.init() #initializing pygame
@@ -28,14 +28,31 @@ class Game: #initializing class Game
         self.running = True
         self.playing = True
         self.clock = pg.time.Clock()
+        self.high_score = 0
+        self.score = 0
+
     def load_data(self, map):
         self.game_dir = path.dirname(__file__)
+        self.game_save_file = path.join(self.game_dir, "highscore.txt")
         self.img_dir = path.join(self.game_dir, 'images')
         # sound tweaking
         self.snd_dir = path.join(self.game_dir, 'audio')
         # imports audio from audio file
         self.pickup_snd = pg.mixer.Sound(path.join(self.snd_dir, "Picked Coin Echo 2.wav"))
         self.map = Map(path.join(self.game_dir, map))
+
+        try:
+            with open(self.game_save_file, "x", encoding="utf-8") as file:
+                file.write("hello world")
+            print("file created successfully!")
+        except:
+            print("File already exists")
+
+        with open(self.game_save_file, "r") as file:
+            try:
+                self.high_score = int(file.read())
+            except:
+                print("high score not red")
     def new(self):
         self.load_data('level1.txt')
         self.all_sprites = pg.sprite.Group()
@@ -75,6 +92,9 @@ class Game: #initializing class Game
     def events(self):
         for event in pg.event.get():
             if event.type == pg.QUIT: #changes the self.running to False to quit the game when the X button is clicked to close the window and quit the while loop in the run method
+                if self.score > self.high_score:
+                    with open(path.join(self.game_dir, self.game_save_file), "w") as f: #check if the current game score is the same or less, if it isnt then it overwrites
+                        f.write(str(self.score))
                 if self.playing:
                     self.playing = False
                 self.running = False
@@ -85,6 +105,7 @@ class Game: #initializing class Game
         # adds fps text and coin collection text
         self.draw_text("FPS:" + str(floor(1/self.dt)), 24, WHITE, WIDTH/2, HEIGHT/4)
         self.draw_text(f"Coins:{self.player.coins}", 24, WHITE, WIDTH/2, HEIGHT/7)
+        self.draw_text("High score: " + str(self.score), 24, WHITE, WIDTH/2, HEIGHT/12)
         pg.display.flip()
 
     def draw_text(self,text,size,color,x,y):
