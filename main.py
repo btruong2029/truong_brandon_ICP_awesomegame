@@ -28,7 +28,7 @@ class Game: #initializing class Game
         self.running = True
         self.playing = True
         self.clock = pg.time.Clock()
-        self.high_score = 0
+        self.high_score = 0 
         self.score = 0
 
     def load_data(self, map):
@@ -38,21 +38,23 @@ class Game: #initializing class Game
         # sound tweaking
         self.snd_dir = path.join(self.game_dir, 'audio')
         # imports audio from audio file
-        self.pickup_snd = pg.mixer.Sound(path.join(self.snd_dir, "Picked Coin Echo 2.wav"))
+        self.pickup_snd = pg.mixer.Sound(path.join(self.snd_dir, "Picked Coin Echo 2.wav")) 
         self.map = Map(path.join(self.game_dir, map))
 
+# checks if save file works
         try:
-            with open(self.game_save_file, "x", encoding="utf-8") as file:
+            with open(self.game_save_file, "x", encoding="utf-8") as file: # "x" opens the file only if it doesnt exist 
                 file.write("hello world")
             print("file created successfully!")
         except:
             print("File already exists")
 
-        with open(self.game_save_file, "r") as file:
+        with open(self.game_save_file, "r") as file: # opens the file and "r"/ reads it
             try:
                 self.high_score = int(file.read())
             except:
-                print("high score not red")
+                print("high score not read")
+
     def new(self):
         self.load_data('level1.txt')
         self.all_sprites = pg.sprite.Group()
@@ -104,13 +106,13 @@ class Game: #initializing class Game
         self.screen.fill(BGCOLOR) #tells the code which color to fill the background
         self.all_sprites.draw(self.screen) #everything will be drawn on the screen
         # adds fps text and coin collection text
-        self.draw_text("FPS:" + str(floor(1/self.dt)), 24, WHITE, WIDTH/2, HEIGHT/4)
+        self.draw_text("FPS:" + str(floor(1/self.dt)), 24, WHITE, WIDTH/2, HEIGHT/4) 
         self.draw_text(f"Coins:{self.player.coins}", 24, WHITE, WIDTH/2, HEIGHT/7)
         self.draw_text("High score: " + str(self.high_score), 24, WHITE, WIDTH/2, HEIGHT/12)
         self.draw_text("Score: " + str(self.score), 24, WHITE, WIDTH/2, HEIGHT/9.5)
         pg.display.flip()
 
-    def draw_text(self,text,size,color,x,y):
+    def draw_text(self,text,size,color,x,y): 
         font_name = pg.font.match_font('arial')
         font = pg.font.Font(font_name, size)
         text_surface = font.render(text, True, color)

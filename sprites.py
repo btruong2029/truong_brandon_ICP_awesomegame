@@ -44,14 +44,14 @@ class Player(Sprite):
         self.groups = game.all_sprites
         Sprite.__init__(self, self.groups)
         self.game = game
-        self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png"))
+        self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png")) # acesses spritesheet/map so we can get player image
         self.load_images()
         self.image = pg.Surface((TILESIZE, TILESIZE))
         self.image = self.spritesheet.get_image(0,0,TILESIZE, TILESIZE)
         self.image.set_colorkey(BLACK)
         # self.image.fill(WHITE)
         self.rect = self.image.get_rect()
-        self.hit_rect = PLAYER_HIT_RECT
+        self.hit_rect = PLAYER_HIT_RECT 
         self.vel = vec(0,0)
         self.pos = vec(x*TILESIZE,y*TILESIZE)
         # animation stuff
@@ -63,17 +63,17 @@ class Player(Sprite):
 
 # creates function for key presses so that the player can move. Up is negative player speed because 0,0 on the code is in the bottom left corner, so negative speed would make it go up.
     def get_keys(self):
-        self.vel = vec(0,0)
+        self.vel = vec(0,0) 
         keys = pg.key.get_pressed()
-        if keys[pg.K_LEFT] or keys[pg.K_a]:
-            self.vel.x = -PLAYER_SPEED
+        if keys[pg.K_LEFT] or keys[pg.K_a]: 
+            self.vel.x = -PLAYER_SPEED 
         if keys[pg.K_RIGHT] or keys[pg.K_d]:
             self.vel.x = PLAYER_SPEED
-        if keys[pg.K_UP] or keys[pg.K_w]:
+        if keys[pg.K_UP] or keys[pg.K_w]: # to move up it would be negative player speed because player spawns in top left, so moving down woud be considered positive
             self.vel.y = -PLAYER_SPEED
         if keys[pg.K_DOWN] or keys[pg.K_s]:
             self.vel.y = PLAYER_SPEED
-        # check to see if player is moving diagonal
+        # check to see if player is moving diagonal, and slows down the player so it doesnt move faster than it is supposed to
         if self.vel.x != 0 and self.vel.y != 0:
             self.vel *= 0.7071
     def animate(self):
@@ -86,7 +86,7 @@ class Player(Sprite):
             self.image = self.idle_frames[self.current_frame]
             self.rect = self.image.get_rect()
             self.rect.bottom = bottom
-    def load_images(self):
+    def load_images(self): #images loaded by taking the pixel location of the image and multiplying it by tile size because it is  (however many images there are) * 32, by 32
         self.idle_frames = [self.spritesheet.get_image(TILESIZE*13,0,TILESIZE, TILESIZE),
                             self.spritesheet.get_image(TILESIZE*14,0,TILESIZE, TILESIZE),
                             self.spritesheet.get_image(TILESIZE*15,0,TILESIZE, TILESIZE),
@@ -137,10 +137,10 @@ class Mob(Sprite):
         self.groups = game.all_sprites, game.all_mobs
         Sprite.__init__(self, self.groups)
         self.game = game
-        self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png"))
+        self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png")) # gets image for mob from sprite sheet
         self.load_images()
         self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image = self.spritesheet.get_image(0,0,TILESIZE, TILESIZE)
+        self.image = self.spritesheet.get_image(0,0,TILESIZE, TILESIZE) 
         self.image = pg.Surface((TILESIZE, TILESIZE))
         self.rect = self.image.get_rect()
         self.speed = 100
@@ -176,19 +176,19 @@ class Mob(Sprite):
                 pass
              
     def chase(self, obj): 
-        if self.pos.x < obj.pos.x:
+        if self.pos.x < obj.pos.x: #obj in this scenario would be the player, therefore if the position of the player is greater that means the player is right of the mob 
             self.vel.x = self.speed
             self.dir = "right"
-        elif self.pos.x > obj.pos.x:
+        elif self.pos.x > obj.pos.x: # same principle accounts for when the mob has a greater position so the mob would have to move left because it is right of the player
             self.vel.x = -self.speed
             self.dir = "left"
         else:
-            self.vel.x = 0
+            self.vel.x = 0 #if it is in the same position of the player then the mob doesnt move
 
-        if self.pos.y < obj.pos.y:
+        if self.pos.y < obj.pos.y: #same principles for left and right movement applied for up and down
             self.vel.y = self.speed
         elif self.pos.y > obj.pos.y:
-            self.vel.y = -self.speed
+            self.vel.y = -self.speed 
         else:
             self.vel.y = 0
 
@@ -220,10 +220,10 @@ class Particle(Sprite):
         self.image = pg.Surface((TILESIZE/8, TILESIZE/8))
         self.image.fill(WHITE)
         self.rect = self.image.get_rect()
-        self.vel = vec(randint(1,25), randint(1,25))
+        self.vel = vec(randint(1,25), randint(1,25)) #causes the particles to move in random vectors/directions ranging from 1 through 25
         self.pos = vec(x,y)
-        self.speed = 5
-        self.countdown = Cooldown()
+        self.speed = 5 # speed of particles movement
+        self.countdown = Cooldown() 
         # if self.speed == 0:
         #     self.speed == 2
         self.countdown.event_time = floor(pg.time.get_ticks()/1000)
@@ -236,7 +236,7 @@ class Particle(Sprite):
 
         self.pos += self.vel * self.speed * self.game.dt
 
-        if self.countdown.delta > 1:
+        if self.countdown.delta > 1: 
             self.kill()
             print("im dead")
 
@@ -251,7 +251,7 @@ class Coin(Sprite):
         self.game = game
         self.image = pg.Surface((TILESIZE, TILESIZE))
         self.image.fill(BGCOLOR)
-        pg.draw.circle(self.image, YELLOW, (16,16), 16)
+        pg.draw.circle(self.image, YELLOW, (16,16), 16) # Draws circle for image because it is a coin, not a square
         self.rect = self.image.get_rect()
         self.pos = vec(x*TILESIZE, y*TILESIZE)
         self.vx, self.vy = 0,0
@@ -260,7 +260,7 @@ class Coin(Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
-    def load_images(self):
+    def load_images(self): #grabs coin image from spritesheet (0,0) because it is the first image
         self.idle_frames = [self.spritesheet.get_image(0,0,TILESIZE, TILESIZE)
                         ]
 

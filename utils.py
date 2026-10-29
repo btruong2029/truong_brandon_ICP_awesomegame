@@ -28,7 +28,7 @@ class Spritesheet:
         return image
 
 class Cooldown:
-    def __init__(self):
+    def __init__(self): # removed time parameter because it is already implemented in the class itself
         self.event_time = 0
         self.current_time = 0
         self.delta = 0
