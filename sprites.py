@@ -2,7 +2,7 @@ import pygame as pg
 from settings import *
 from pygame.sprite import Sprite
 from utils import *
-
+from random import randint
 from os import path
 
 vec = pg.math.Vector2
@@ -98,6 +98,8 @@ class Player(Sprite):
         self.get_keys()
         hits = pg.sprite.spritecollide(self, self.game.all_coins, True)
         if hits:
+            for i in range(100):
+                Particle(self.game, hits[0].pos.x, hits[0].pos.y) #Hits[0] is where the player first hits the coin, so the particles spawn where it first hits
             # when picking up the coin, it adds to the coin counter and plays the pickup audio
             self.coins += 1
             self.game.pickup_snd.play()
@@ -210,6 +212,37 @@ class Mob(Sprite):
         collide_with_walls(self, self.game.all_walls, 'y')
         self.rect.center = self.hit_rect.center
 
+class Particle(Sprite):
+    def __init__(self, game, x , y):
+        self.groups = game.all_sprites, game.all_particles
+        Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((TILESIZE/8, TILESIZE/8))
+        self.image.fill(WHITE)
+        self.rect = self.image.get_rect()
+        self.vel = vec(randint(1,25), randint(1,25))
+        self.pos = vec(x,y)
+        self.speed = 5
+        self.countdown = Cooldown()
+        # if self.speed == 0:
+        #     self.speed == 2
+        self.countdown.event_time = floor(pg.time.get_ticks()/1000)
+        print(self.pos.x)
+        print(self.pos.y)
+        print(str(len(self.game.all_particles)))
+
+    def update(self):
+        self.countdown.ticking()
+
+        self.pos += self.vel * self.speed * self.game.dt
+
+        if self.countdown.delta > 1:
+            self.kill()
+            print("im dead")
+
+        print(self.countdown.delta)
+        self.rect.x = self.pos.x
+        self.rect.y = self.pos.y
 
 class Coin(Sprite):
     def __init__(self, game, x, y):
@@ -220,6 +253,7 @@ class Coin(Sprite):
         self.image.fill(BGCOLOR)
         pg.draw.circle(self.image, YELLOW, (16,16), 16)
         self.rect = self.image.get_rect()
+        self.pos = vec(x*TILESIZE, y*TILESIZE)
         self.vx, self.vy = 0,0
         self.x = x*TILESIZE
         self.y = y*TILESIZE

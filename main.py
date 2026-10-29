@@ -59,6 +59,7 @@ class Game: #initializing class Game
         self.all_walls = pg.sprite.Group()
         self.all_mobs = pg.sprite.Group()
         self.all_coins = pg.sprite.Group()
+        self.all_particles = pg.sprite.Group()
         
 
  # adds the classes to the game, or where all of them get instantiated into the game
@@ -105,7 +106,8 @@ class Game: #initializing class Game
         # adds fps text and coin collection text
         self.draw_text("FPS:" + str(floor(1/self.dt)), 24, WHITE, WIDTH/2, HEIGHT/4)
         self.draw_text(f"Coins:{self.player.coins}", 24, WHITE, WIDTH/2, HEIGHT/7)
-        self.draw_text("High score: " + str(self.score), 24, WHITE, WIDTH/2, HEIGHT/12)
+        self.draw_text("High score: " + str(self.high_score), 24, WHITE, WIDTH/2, HEIGHT/12)
+        self.draw_text("Score: " + str(self.score), 24, WHITE, WIDTH/2, HEIGHT/9.5)
         pg.display.flip()
 
     def draw_text(self,text,size,color,x,y):
