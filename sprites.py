@@ -53,29 +53,58 @@ class Player(Sprite):
         self.rect = self.image.get_rect()
         self.hit_rect = PLAYER_HIT_RECT 
         self.vel = vec(0,0)
+        self.acc = vec(0,0)
         self.pos = vec(x*TILESIZE,y*TILESIZE)
         # animation stuff
         self.last_update = 0
         self.current_frame = 0
+        self.dir = "none"
         print('player instantiated')
         print(self.pos)
         self.coins = 0 # Coin counter variable
+        self.cofric = -0.1
+        self.jumping = False
 
 # creates function for key presses so that the player can move. Up is negative player speed because 0,0 on the code is in the bottom left corner, so negative speed would make it go up.
     def get_keys(self):
-        self.vel = vec(0,0) 
+        # self.vel = vec(0,0)
+        self.dir = "none" 
         keys = pg.key.get_pressed()
         if keys[pg.K_LEFT] or keys[pg.K_a]: 
-            self.vel.x = -PLAYER_SPEED 
+            # self.vel.x = -PLAYER_SPEED 
+            self.acc.x = -PLAYER_SPEED 
         if keys[pg.K_RIGHT] or keys[pg.K_d]:
-            self.vel.x = PLAYER_SPEED
+            # self.vel.x = PLAYER_SPEED
+            self.acc.x = PLAYER_SPEED
         if keys[pg.K_UP] or keys[pg.K_w]: # to move up it would be negative player speed because player spawns in top left, so moving down woud be considered positive
-            self.vel.y = -PLAYER_SPEED
+            # self.vel.y = -PLAYER_SPEED
+            self.acc.y = -PLAYER_SPEED
         if keys[pg.K_DOWN] or keys[pg.K_s]:
-            self.vel.y = PLAYER_SPEED
+            # self.vel.y = PLAYER_SPEED
+            self.acc.y = PLAYER_SPEED
+        if keys[pg.K_SPACE]:
+            self.jump()
         # check to see if player is moving diagonal, and slows down the player so it doesnt move faster than it is supposed to
+        # if self.vel.x != 0 and self.vel.y != 0:
+        #     self.vel *= 0.7071
         if self.vel.x != 0 and self.vel.y != 0:
             self.vel *= 0.7071
+    def jump (self):
+        # jump only if standing on a platform
+        self.rect.y += 2
+        hits = pg.sprite.spritecollide(self, self.game.all_walls, False)
+        self.rect.y -= 2
+        if hits and not self.jumping:
+            self.game.jump_snd.play()
+            self.jumping = True
+            self.vel.y = -PLAYER_JUMP
+
+    def is_jumping(self):
+        if self.vel.y > 0:
+            hits = pg.sprite.spritecollide(self, self.game.all_walls, False)
+            if hits:
+                self.jumping = False
+    
     def animate(self):
         # use the time element to get now
         now = pg.time.get_ticks()
@@ -95,7 +124,21 @@ class Player(Sprite):
                             
                             ]
     def update(self):
+        # self.acc = vec(0,0)
+        # self.get_keys()
+        self.animate()
+        self.is_jumping()
+        self.acc = vec(0,PLAYER_GRAV)
         self.get_keys()
+        self.acc. x += self.vel.x * PLAYER_FRICTION
+        self.acc. y += self.vel.y * PLAYER_FRICTION
+        self.vel += self.acc
+        if abs(self.vel.x) <0.1:
+            self.vel.x = 0
+        if abs(self.vel.y) <0.1:
+            self.vel.y = 0
+        # self.rect.center = self.pos
+        self.pos += self.vel + 0.5 * self.acc
         hits = pg.sprite.spritecollide(self, self.game.all_coins, True)
         if hits:
             for i in range(100):
@@ -104,15 +147,13 @@ class Player(Sprite):
             self.coins += 1
             self.game.pickup_snd.play()
             self.game.score += 1
-        self.animate()
-        self.rect.center = self.pos
-        self.pos += self.vel * self.game.dt
+        # self.pos += self.vel * self.game.dt
         self.hit_rect.centerx = self.pos.x
         collide_with_walls(self, self.game.all_walls, 'x')
         self.hit_rect.centery = self.pos.y
-        collide_with_walls(self, self.game.all_walls, 'y')
+        if collide_with_walls(self, self.game.all_walls, 'y'):
+            self.jumping = False
         self.rect.center = self.hit_rect.center
-
     
 
 class Wall(Sprite):
@@ -223,7 +264,7 @@ class Particle(Sprite):
         self.vel = vec(randint(1,25), randint(1,25)) #causes the particles to move in random vectors/directions ranging from 1 through 25
         self.pos = vec(x,y)
         self.speed = 5 # speed of particles movement
-        self.countdown = Cooldown() 
+        self.countdown = Timer() 
         # if self.speed == 0:
         #     self.speed == 2
         self.countdown.event_time = floor(pg.time.get_ticks()/1000)
@@ -232,11 +273,11 @@ class Particle(Sprite):
         print(str(len(self.game.all_particles)))
 
     def update(self):
-        self.countdown.ticking()
-
+        # self.countdown.ticking()
+        print(self.countdown.get_delta())
         self.pos += self.vel * self.speed * self.game.dt
-
-        if self.countdown.delta > 1: 
+        # use the countdown to eliminate particles after 2 seconds
+        if self.countdown.get_delta > 2: 
             self.kill()
             print("im dead")
 

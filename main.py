@@ -12,6 +12,14 @@
 # Output: Graphics - things are drawn, sound: jump, walking, power up,
 # haptics
 
+#GOALS Get more goals than enemy team before time runs out
+
+#RULES Dont touch the ball with your hand
+
+#FEEDBACK when the ball goes into the goal you score
+
+#FREEDOM you can move freely
+
 import pygame as pg #importing as pg to make typing pygame easier
 from os import path
 from settings import * #imports everything from settings.py
@@ -39,6 +47,7 @@ class Game: #initializing class Game
         self.snd_dir = path.join(self.game_dir, 'audio')
         # imports audio from audio file
         self.pickup_snd = pg.mixer.Sound(path.join(self.snd_dir, "Picked Coin Echo 2.wav")) 
+        self.jump_snd = pg.mixer.Sound(path.join(self.snd_dir, "slime_jump.wav")) 
         self.map = Map(path.join(self.game_dir, map))
 
 # checks if save file works
