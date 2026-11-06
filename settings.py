@@ -1,4 +1,6 @@
 import pygame as pg
+
+# Screen/Game constants
 WIDTH = 1024
 HEIGHT = 768
 TITLE = "Best game evah!!!"

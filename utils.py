@@ -1,7 +1,8 @@
 import pygame as pg
 from settings import *
 from math import floor
- 
+
+# Map is read from "level1.txt", and as the file is read, the code knows whether to instantiate a wall, player, mob, coin, etc... based on the letter in the map
 class Map:
     def __init__(self, filename):
         self.data = []
@@ -15,8 +16,8 @@ class Map:
         self.height = self.tileheight * TILESIZE 
 
 
-
-class Spritesheet:
+# Sprite sheet is used for character models/images, uses a 32 by 32 base image mapping, and x value multiplies with the amount of images added to the spritesheet
+class Spritesheet: 
     def __init__(self, filename):
         self.spritesheet = pg.image.load(filename).convert()
 
@@ -27,6 +28,7 @@ class Spritesheet:
         image = new_image
         return image
 
+#Timer used so particles know when to die/get killed from the moment of it's instantiation
 class Timer:
     def __init__(self): # removed time parameter because it is already implemented in the class itself
         self.event_time = floor((pg.time.get_ticks()/1000))

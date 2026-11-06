@@ -33,15 +33,15 @@ class Game: #initializing class Game
         self.screen = pg.display.set_mode((WIDTH, HEIGHT)) #setting screen size to 800x600 from settings.py
         print("game initialized...")
         pg.display.set_caption(TITLE) #changing window name to TITLE from settings.py
-        self.running = True
+        self.running = True 
         self.playing = True
         self.clock = pg.time.Clock()
         self.high_score = 0 
         self.score = 0
 
-    def load_data(self, map):
+    def load_data(self, map): # Load data responsible for accessing/making images, sounds, and text 
         self.game_dir = path.dirname(__file__)
-        self.game_save_file = path.join(self.game_dir, "highscore.txt")
+        self.game_save_file = path.join(self.game_dir, "highscore.txt") 
         self.img_dir = path.join(self.game_dir, 'images')
         # sound tweaking
         self.snd_dir = path.join(self.game_dir, 'audio')
@@ -64,7 +64,7 @@ class Game: #initializing class Game
             except:
                 print("high score not read")
 
-    def new(self):
+    def new(self): #instantiates sprites
         self.load_data('level1.txt')
         self.all_sprites = pg.sprite.Group()
         self.all_walls = pg.sprite.Group()

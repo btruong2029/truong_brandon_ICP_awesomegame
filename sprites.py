@@ -38,7 +38,7 @@ def collide_with_walls(sprite, group, dir):
             sprite.vel.y = 0
             sprite.hit_rect.centery = sprite.pos.y
 
-#creates player class, and all of it's attributes. ex: position, color, etc...
+#creates player class, and all of it's attributes. ex: position, color, etc..., all of the classes like walls and mobs follow basically the same principles of the player, all of them have collision and similar instantiation
 class Player(Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites
@@ -63,7 +63,7 @@ class Player(Sprite):
         print(self.pos)
         self.coins = 0 # Coin counter variable
         self.cofric = -0.1
-        self.jumping = False
+        self.jumping = False # makes sure character doesn't start jumping/is constantly jumping
 
 # creates function for key presses so that the player can move. Up is negative player speed because 0,0 on the code is in the bottom left corner, so negative speed would make it go up.
     def get_keys(self):
@@ -128,9 +128,9 @@ class Player(Sprite):
         # self.get_keys()
         self.animate()
         self.is_jumping()
-        self.acc = vec(0,PLAYER_GRAV)
+        self.acc = vec(0,PLAYER_GRAV) #Player has gravity pushed upon it at all times
         self.get_keys()
-        self.acc. x += self.vel.x * PLAYER_FRICTION
+        self.acc. x += self.vel.x * PLAYER_FRICTION 
         self.acc. y += self.vel.y * PLAYER_FRICTION
         self.vel += self.acc
         if abs(self.vel.x) <0.1:
@@ -156,6 +156,7 @@ class Player(Sprite):
         self.rect.center = self.hit_rect.center
     
 
+
 class Wall(Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.all_walls
@@ -172,7 +173,7 @@ class Wall(Sprite):
         # print("wall initialized")
         # print(self.rect.x)
         # print(self.rect.y)
-        
+
 class Mob(Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.all_mobs
@@ -287,7 +288,7 @@ class Particle(Sprite):
 
 class Coin(Sprite):
     def __init__(self, game, x, y):
-        self.groups = game.all_sprites, game.all_coins
+        self.groups = game.all_sprites, game.all_coins 
         Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pg.Surface((TILESIZE, TILESIZE))
