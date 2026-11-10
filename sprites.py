@@ -262,9 +262,9 @@ class Particle(Sprite):
         self.image = pg.Surface((TILESIZE/8, TILESIZE/8))
         self.image.fill(WHITE)
         self.rect = self.image.get_rect()
-        self.vel = vec(randint(1,25), randint(1,25)) #causes the particles to move in random vectors/directions ranging from 1 through 25
+        self.vel = vec(randint(-180,180), randint(-180,180)) #causes the particles to move in random vectors/directions ranging from 1 through 25
         self.pos = vec(x,y)
-        self.speed = 5 # speed of particles movement
+        self.speed = .5 # speed of particles movement
         self.countdown = Timer() 
         # if self.speed == 0:
         #     self.speed == 2
@@ -278,11 +278,9 @@ class Particle(Sprite):
         print(self.countdown.get_delta())
         self.pos += self.vel * self.speed * self.game.dt
         # use the countdown to eliminate particles after 2 seconds
-        if self.countdown.get_delta > 2: 
+        if self.countdown.get_delta() > 2: 
             self.kill()
             print("im dead")
-
-        print(self.countdown.delta)
         self.rect.x = self.pos.x
         self.rect.y = self.pos.y
 

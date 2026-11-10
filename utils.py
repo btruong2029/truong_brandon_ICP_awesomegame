@@ -31,7 +31,7 @@ class Spritesheet:
 #Timer used so particles know when to die/get killed from the moment of it's instantiation
 class Timer:
     def __init__(self): # removed time parameter because it is already implemented in the class itself
-        self.event_time = floor((pg.time.get_ticks()/1000))
+        self.event_time = floor((pg.time.get_ticks())/1000)
     def get_delta(self):
         # returns difference in time in seconds from time of instantiation to now
         return floor((pg.time.get_ticks())/1000) - self.event_time
