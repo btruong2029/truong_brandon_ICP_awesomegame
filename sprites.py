@@ -304,4 +304,22 @@ class Coin(Sprite):
         self.idle_frames = [self.spritesheet.get_image(0,0,TILESIZE, TILESIZE)
                         ]
 
-    
+class Soccerball(Sprite):
+    def __init__(self, game, x, y):
+        self.groups = game.all_sprites, game.all_coins
+        Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.image.fill(BGCOLOR)
+        pg.draw.circle(self.image, (16,16), 16)
+        self.rect = self.image.get_rect()
+        self.pos = vec(x*TILESIZE, y*TILESIZE)
+        self.vx, self.vy = 0,0
+        self.x = x*TILESIZE
+        self.y = y*TILESIZE
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+    def load_images(self): #grabs coin image from spritesheet (0,0) because it is the first image
+        self.idle_frames = [self.spritesheet.get_image(0,0,TILESIZE, TILESIZE)
+        ]
