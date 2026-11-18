@@ -19,10 +19,10 @@ class Map:
 # Sprite sheet is used for character models/images, uses a 32 by 32 base image mapping, and x value multiplies with the amount of images added to the spritesheet
 class Spritesheet: 
     def __init__(self, filename):
-        self.spritesheet = pg.image.load(filename).convert()
+        self.spritesheet = pg.image.load(filename).convert_alpha()
 
     def get_image(self, x, y, width, height):
-        image = pg.Surface((width, height))
+        image = pg.Surface((width, height), pg.SRCALPHA)
         image.blit(self.spritesheet, (0,0), (x,y, width, height))
         new_image = pg.transform.scale(image, (width, height))
         image = new_image

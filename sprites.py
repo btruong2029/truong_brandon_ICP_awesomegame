@@ -44,14 +44,13 @@ class Player(Sprite):
         self.groups = game.all_sprites
         Sprite.__init__(self, self.groups)
         self.game = game
-        self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png")) # acesses spritesheet/map so we can get player image
+        self.spritesheet = Spritesheet(path.join(self.game.img_dir, "spritesheet.png")) # acesses spritesheet/map so we can get player image
         self.load_images()
+        self.current_frame = None
         self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image = self.spritesheet.get_image(0,0,TILESIZE, TILESIZE)
-        self.image.set_colorkey(BLACK)
-        # self.image.fill(WHITE)
+        self.image = self.spritesheet.get_image(0,0,TILESIZE *2, TILESIZE*2)
         self.rect = self.image.get_rect()
-        self.hit_rect = PLAYER_HIT_RECT 
+        self.hit_rect = PLAYER_HIT_RECT
         self.vel = vec(0,0)
         self.acc = vec(0,0)
         self.pos = vec(x*TILESIZE,y*TILESIZE)
@@ -62,8 +61,10 @@ class Player(Sprite):
         print('player instantiated')
         print(self.pos)
         self.coins = 0 # Coin counter variable
-        self.cofric = -0.1
+        self.cofric = -0.05
         self.jumping = False # makes sure character doesn't start jumping/is constantly jumping
+        
+
 
 # creates function for key presses so that the player can move. Up is negative player speed because 0,0 on the code is in the bottom left corner, so negative speed would make it go up.
     def get_keys(self):
@@ -71,17 +72,12 @@ class Player(Sprite):
         self.dir = "none" 
         keys = pg.key.get_pressed()
         if keys[pg.K_LEFT] or keys[pg.K_a]: 
-            # self.vel.x = -PLAYER_SPEED 
             self.acc.x = -PLAYER_SPEED 
+            self.dir = "left"
         if keys[pg.K_RIGHT] or keys[pg.K_d]:
             # self.vel.x = PLAYER_SPEED
             self.acc.x = PLAYER_SPEED
-        if keys[pg.K_UP] or keys[pg.K_w]: # to move up it would be negative player speed because player spawns in top left, so moving down woud be considered positive
-            # self.vel.y = -PLAYER_SPEED
-            self.acc.y = -PLAYER_SPEED
-        if keys[pg.K_DOWN] or keys[pg.K_s]:
-            # self.vel.y = PLAYER_SPEED
-            self.acc.y = PLAYER_SPEED
+            self.dir = "right"
         if keys[pg.K_SPACE]:
             self.jump()
         # check to see if player is moving diagonal, and slows down the player so it doesnt move faster than it is supposed to
@@ -99,6 +95,7 @@ class Player(Sprite):
             self.jumping = True
             self.vel.y = -PLAYER_JUMP
 
+
     def is_jumping(self):
         if self.vel.y > 0:
             hits = pg.sprite.spritecollide(self, self.game.all_walls, False)
@@ -108,21 +105,51 @@ class Player(Sprite):
     def animate(self):
         # use the time element to get now
         now = pg.time.get_ticks()
-        if now - self.last_update > 150:
-            self.last_update = now
-            self.current_frame = (self.current_frame + 1) % len(self.idle_frames)
-            bottom = self.rect.bottom
-            self.image = self.idle_frames[self.current_frame]
-            self.rect = self.image.get_rect()
-            self.rect.bottom = bottom
+        if self.dir == "none":
+            if now - self.last_update > 100:
+                self.last_update = now
+                self.current_frame = (self.current_frame + 1) % len(self.idle_frames)
+                bottom = self.rect.bottom
+                self.image = self.idle_frames[self.current_frame]
+                self.rect = self.image.get_rect()
+                self.rect.bottom = bottom
+        elif self.dir == "left":
+            if now - self.last_update > 1:
+                self.last_update = now
+                self.current_frame = (self.current_frame + 1) % len(self.run_frames)
+                bottom = self.rect.bottom
+                self.image = self.run_frames[self.current_frame]
+                self.rect = self.image.get_rect()
+                self.rect.bottom = bottom
+        elif self.dir == "right":
+            if now - self.last_update > 1:
+                self.last_update = now
+                self.current_frame = (self.current_frame + 1) % len(self.run_frames)
+                bottom = self.rect.bottom
+                self.image = self.run_frames[self.current_frame]
+                self.rect = self.image.get_rect()
+                self.rect.bottom = bottom
+                new_image = pg.transform.flip(self.image, True, False)
+                self.image = new_image
+
     def load_images(self): #images loaded by taking the pixel location of the image and multiplying it by tile size because it is  (however many images there are) * 32, by 32
-        self.idle_frames = [self.spritesheet.get_image(TILESIZE*13,0,TILESIZE, TILESIZE),
-                            self.spritesheet.get_image(TILESIZE*14,0,TILESIZE, TILESIZE),
-                            self.spritesheet.get_image(TILESIZE*15,0,TILESIZE, TILESIZE),
-                            self.spritesheet.get_image(TILESIZE*16,0,TILESIZE, TILESIZE),
-                            self.spritesheet.get_image(TILESIZE*17,0,TILESIZE, TILESIZE)
+            self.idle_frames = [self.spritesheet.get_image(TILESIZE*0,0, TILESIZE, TILESIZE)]
+            self.run_frames = [self.spritesheet.get_image(TILESIZE*1,0,TILESIZE, TILESIZE),
+            self.spritesheet.get_image(TILESIZE*2,0,TILESIZE, TILESIZE),
+            self.spritesheet.get_image(TILESIZE*3,0,TILESIZE, TILESIZE),
+            self.spritesheet.get_image(TILESIZE*4,0,TILESIZE, TILESIZE),
+            self.spritesheet.get_image(TILESIZE*5,0,TILESIZE, TILESIZE),
+            self.spritesheet.get_image(TILESIZE*6,0,TILESIZE, TILESIZE),
+            self.spritesheet.get_image(TILESIZE*7,0,TILESIZE, TILESIZE),
+            self.spritesheet.get_image(TILESIZE*8,0,TILESIZE, TILESIZE),
+            self.spritesheet.get_image(TILESIZE*9,0,TILESIZE, TILESIZE),
+            self.spritesheet.get_image(TILESIZE*10,0,TILESIZE, TILESIZE),
+            self.spritesheet.get_image(TILESIZE*11,0,TILESIZE, TILESIZE),
+            self.spritesheet.get_image(TILESIZE*12,0,TILESIZE, TILESIZE),
+            self.spritesheet.get_image(TILESIZE*13,0,TILESIZE, TILESIZE),
+            self.spritesheet.get_image(TILESIZE*14,0,TILESIZE, TILESIZE)
+            ]
                             
-                            ]
     def update(self):
         # self.acc = vec(0,0)
         # self.get_keys()
@@ -139,7 +166,7 @@ class Player(Sprite):
             self.vel.y = 0
         # self.rect.center = self.pos
         self.pos += self.vel + 0.5 * self.acc
-        hits = pg.sprite.spritecollide(self, self.game.all_coins, True)
+        hits = pg.sprite.spritecollide(self, self.game.all_coins, self.game.all_balls, True)
         if hits:
             for i in range(100):
                 Particle(self.game, hits[0].pos.x, hits[0].pos.y) #Hits[0] is where the player first hits the coin, so the particles spawn where it first hits
@@ -306,20 +333,33 @@ class Coin(Sprite):
 
 class Soccerball(Sprite):
     def __init__(self, game, x, y):
-        self.groups = game.all_sprites, game.all_coins
+        self.groups = game.all_sprites, game.all_balls
         Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image.fill(BGCOLOR)
-        pg.draw.circle(self.image, (16,16), 16)
+        self.spritesheet = Spritesheet(path.join(self.game.img_dir, "spritesheet.png"))
+        self.image = self.spritesheet.get_image(TILESIZE*64,0,TILESIZE, TILESIZE)
         self.rect = self.image.get_rect()
+        # self.image.set_colorkey(BLACK)
         self.pos = vec(x*TILESIZE, y*TILESIZE)
         self.vx, self.vy = 0,0
         self.x = x*TILESIZE
         self.y = y*TILESIZE
         self.rect.x = self.x
         self.rect.y = self.y
+        self.vel = vec(0,0)
+        self.acc = vec(0,0)
+        self.hit_rect = BALL_HIT_RECT
 
-    def load_images(self): #grabs coin image from spritesheet (0,0) because it is the first image
-        self.idle_frames = [self.spritesheet.get_image(0,0,TILESIZE, TILESIZE)
+    def load_images(self):
+        self.idle_frames = [self.spritesheet.get_image(TILESIZE*64,0,TILESIZE, TILESIZE)
         ]
+
+    def update(self):
+        self.acc = vec(0,BALL_GRAV)
+        self.rect.center = self.pos
+        self.pos += self.vel * self.game.dt
+        self.hit_rect.centerx = self.pos.x
+        collide_with_walls(self, self.game.all_walls, 'x')
+        self.hit_rect.centery = self.pos.y
+        collide_with_walls(self, self.game.all_walls, 'y')
+        self.rect.center = self.hit_rect.center
