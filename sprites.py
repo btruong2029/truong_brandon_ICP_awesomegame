@@ -63,7 +63,17 @@ class Player(Sprite):
         self.coins = 0 # Coin counter variable
         self.cofric = -0.05
         self.jumping = False # makes sure character doesn't start jumping/is constantly jumping
-        
+        self.held_ball = None
+
+    def pickup_ball(self):
+
+        if not self.held_ball:
+            hits = pg.sprite.spritecollide(self, self.game.all_balls, False)
+            if hits:
+                print("collide")
+                self.held_ball = hits[0]
+                self.held_ball.held = True
+                self.held_ball.vel = vec(0,0)
 
 
 # creates function for key presses so that the player can move. Up is negative player speed because 0,0 on the code is in the bottom left corner, so negative speed would make it go up.
@@ -181,7 +191,11 @@ class Player(Sprite):
         if collide_with_walls(self, self.game.all_walls, 'y'):
             self.jumping = False
         self.rect.center = self.hit_rect.center
-    
+        self.pickup_ball()
+        if self.held_ball:
+            self.held_ball.pos = vec(self.pos.x - TILESIZE, self.pos.y)
+            self.held_ball.rect.center = self.held_ball.pos
+        
 
 
 class Wall(Sprite):
@@ -349,17 +363,20 @@ class Soccerball(Sprite):
         self.vel = vec(0,0)
         self.acc = vec(0,0)
         self.hit_rect = BALL_HIT_RECT
+        self.held = False
+        self.dir = "none"
 
     def load_images(self):
         self.idle_frames = [self.spritesheet.get_image(TILESIZE*64,0,TILESIZE, TILESIZE)
         ]
 
     def update(self):
-        self.acc = vec(0,BALL_GRAV)
-        self.rect.center = self.pos
-        self.pos += self.vel * self.game.dt
-        self.hit_rect.centerx = self.pos.x
-        collide_with_walls(self, self.game.all_walls, 'x')
-        self.hit_rect.centery = self.pos.y
-        collide_with_walls(self, self.game.all_walls, 'y')
-        self.rect.center = self.hit_rect.center
+        if self.held:   
+            self.vel = vec(0,BALL_GRAV)
+            self.rect.center = self.pos
+            self.pos += self.vel * self.game.dt
+            self.hit_rect.centerx = self.pos.x
+            collide_with_walls(self, self.game.all_walls, 'x')
+            self.hit_rect.centery = self.pos.y
+            collide_with_walls(self, self.game.all_walls, 'y')
+            self.rect.center = self.hit_rect.center
