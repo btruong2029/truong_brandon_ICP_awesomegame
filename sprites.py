@@ -48,7 +48,8 @@ class Player(Sprite):
         self.load_images()
         self.current_frame = None
         self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image = self.spritesheet.get_image(0,0,TILESIZE *2, TILESIZE*2)
+        self.image = self.spritesheet.get_image(0,0,TILESIZE, TILESIZE)
+        self.image = pg.transform.scale(self.image, (TILESIZE*2,TILESIZE*2))
         self.rect = self.image.get_rect()
         self.hit_rect = PLAYER_HIT_RECT
         self.vel = vec(0,0)
@@ -63,17 +64,16 @@ class Player(Sprite):
         self.coins = 0 # Coin counter variable
         self.cofric = -0.05
         self.jumping = False # makes sure character doesn't start jumping/is constantly jumping
-        self.held_ball = None
+        self.held_ball = None # checks if the player is holding the ball, uses None because it stands for what object the player is holding, not whether it is holding the object or not
+        
 
     def pickup_ball(self):
-
-        if not self.held_ball:
-            hits = pg.sprite.spritecollide(self, self.game.all_balls, False)
+        if not self.held_ball: 
+            hits = pg.sprite.spritecollide(self, self.game.all_balls, False) 
             if hits:
                 print("collide")
-                self.held_ball = hits[0]
-                self.held_ball.held = True
-                self.held_ball.vel = vec(0,0)
+                self.held_ball = hits[0] #hits[0] stands for the first object it picks up, or the ball, so held_ball is set to the ball itself
+                self.held_ball.held = True #ball.held is for if the ball is held or not
 
 
 # creates function for key presses so that the player can move. Up is negative player speed because 0,0 on the code is in the bottom left corner, so negative speed would make it go up.
@@ -90,6 +90,9 @@ class Player(Sprite):
             self.dir = "right"
         if keys[pg.K_SPACE]:
             self.jump()
+        if keys[pg.K_e]:
+            self.shoot_ball()
+            
         # check to see if player is moving diagonal, and slows down the player so it doesnt move faster than it is supposed to
         # if self.vel.x != 0 and self.vel.y != 0:
         #     self.vel *= 0.7071
@@ -111,7 +114,16 @@ class Player(Sprite):
             hits = pg.sprite.spritecollide(self, self.game.all_walls, False)
             if hits:
                 self.jumping = False
-    
+
+    def shoot_ball(self):
+        if self.held_ball:
+            self.held_ball_held = False
+            if self.direction == -1:
+                self.held_ball.velocity = vec(-100,100) 
+            else:
+                self.held_ball.velocity = vec(100,100)
+            self.held_ball = None
+
     def animate(self):
         # use the time element to get now
         now = pg.time.get_ticks()
@@ -131,6 +143,7 @@ class Player(Sprite):
                 self.image = self.run_frames[self.current_frame]
                 self.rect = self.image.get_rect()
                 self.rect.bottom = bottom
+                self.direction = -1
         elif self.dir == "right":
             if now - self.last_update > 1:
                 self.last_update = now
@@ -141,23 +154,28 @@ class Player(Sprite):
                 self.rect.bottom = bottom
                 new_image = pg.transform.flip(self.image, True, False)
                 self.image = new_image
+                self.direction = 1
 
     def load_images(self): #images loaded by taking the pixel location of the image and multiplying it by tile size because it is  (however many images there are) * 32, by 32
-            self.idle_frames = [self.spritesheet.get_image(TILESIZE*0,0, TILESIZE, TILESIZE)]
-            self.run_frames = [self.spritesheet.get_image(TILESIZE*1,0,TILESIZE, TILESIZE),
-            self.spritesheet.get_image(TILESIZE*2,0,TILESIZE, TILESIZE),
-            self.spritesheet.get_image(TILESIZE*3,0,TILESIZE, TILESIZE),
-            self.spritesheet.get_image(TILESIZE*4,0,TILESIZE, TILESIZE),
-            self.spritesheet.get_image(TILESIZE*5,0,TILESIZE, TILESIZE),
-            self.spritesheet.get_image(TILESIZE*6,0,TILESIZE, TILESIZE),
-            self.spritesheet.get_image(TILESIZE*7,0,TILESIZE, TILESIZE),
-            self.spritesheet.get_image(TILESIZE*8,0,TILESIZE, TILESIZE),
-            self.spritesheet.get_image(TILESIZE*9,0,TILESIZE, TILESIZE),
-            self.spritesheet.get_image(TILESIZE*10,0,TILESIZE, TILESIZE),
-            self.spritesheet.get_image(TILESIZE*11,0,TILESIZE, TILESIZE),
-            self.spritesheet.get_image(TILESIZE*12,0,TILESIZE, TILESIZE),
-            self.spritesheet.get_image(TILESIZE*13,0,TILESIZE, TILESIZE),
-            self.spritesheet.get_image(TILESIZE*14,0,TILESIZE, TILESIZE)
+            # if self.direction == -1:
+            #     self.idle_frames = [self.spritesheet.get_image(TILESIZE*0,0, TILESIZE, TILESIZE)]
+            # else:
+            #     self.idle_frames = [self.spritesheet.get_image(TILESIZE*15,0, TILESIZE, TILESIZE)]
+            self.idle_frames = [pg.transform.scale(self.spritesheet.get_image(TILESIZE*0,0, TILESIZE, TILESIZE),(TILESIZE*1.5,TILESIZE*1.5))]
+            self.run_frames = [pg.transform.scale(self.spritesheet.get_image(TILESIZE*1,0,TILESIZE, TILESIZE), (TILESIZE*1.5,TILESIZE*1.5)),
+            pg.transform.scale(self.spritesheet.get_image(TILESIZE*2,0,TILESIZE, TILESIZE), (TILESIZE*1.5,TILESIZE*1.5)),
+            pg.transform.scale(self.spritesheet.get_image(TILESIZE*3,0,TILESIZE, TILESIZE), (TILESIZE*1.5,TILESIZE*1.5)),
+            pg.transform.scale(self.spritesheet.get_image(TILESIZE*4,0,TILESIZE, TILESIZE), (TILESIZE*1.5,TILESIZE*1.5)),
+            pg.transform.scale(self.spritesheet.get_image(TILESIZE*5,0,TILESIZE, TILESIZE), (TILESIZE*1.5,TILESIZE*1.5)),
+            pg.transform.scale(self.spritesheet.get_image(TILESIZE*6,0,TILESIZE, TILESIZE), (TILESIZE*1.5,TILESIZE*1.5)),
+            pg.transform.scale(self.spritesheet.get_image(TILESIZE*7,0,TILESIZE, TILESIZE), (TILESIZE*1.5,TILESIZE*1.5)),
+            pg.transform.scale(self.spritesheet.get_image(TILESIZE*8,0,TILESIZE, TILESIZE), (TILESIZE*1.5,TILESIZE*1.5)),
+            pg.transform.scale(self.spritesheet.get_image(TILESIZE*9,0,TILESIZE, TILESIZE), (TILESIZE*1.5,TILESIZE*1.5)),
+            pg.transform.scale(self.spritesheet.get_image(TILESIZE*10,0,TILESIZE, TILESIZE), (TILESIZE*1.5,TILESIZE*1.5)),
+            pg.transform.scale(self.spritesheet.get_image(TILESIZE*11,0,TILESIZE, TILESIZE), (TILESIZE*1.5,TILESIZE*1.5)),
+            pg.transform.scale(self.spritesheet.get_image(TILESIZE*12,0,TILESIZE, TILESIZE), (TILESIZE*1.5,TILESIZE*1.5)),
+            pg.transform.scale(self.spritesheet.get_image(TILESIZE*13,0,TILESIZE, TILESIZE), (TILESIZE*1.5,TILESIZE*1.5)),
+            pg.transform.scale(self.spritesheet.get_image(TILESIZE*14,0,TILESIZE, TILESIZE), (TILESIZE*1.5,TILESIZE*1.5))
             ]
                             
     def update(self):
@@ -176,14 +194,14 @@ class Player(Sprite):
             self.vel.y = 0
         # self.rect.center = self.pos
         self.pos += self.vel + 0.5 * self.acc
-        hits = pg.sprite.spritecollide(self, self.game.all_coins, self.game.all_balls, True)
-        if hits:
-            for i in range(100):
-                Particle(self.game, hits[0].pos.x, hits[0].pos.y) #Hits[0] is where the player first hits the coin, so the particles spawn where it first hits
+        hits = pg.sprite.spritecollide(self, self.game.all_balls, False)
+        # if hits:
+        #     for i in range(100):
+        #         Particle(self.game, hits[0].pos.x, hits[0].pos.y) #Hits[0] is where the player first hits the coin, so the particles spawn where it first hits
             # when picking up the coin, it adds to the coin counter and plays the pickup audio
-            self.coins += 1
-            self.game.pickup_snd.play()
-            self.game.score += 1
+            # self.coins += 1
+            # self.game.pickup_snd.play()
+            # self.game.score += 1
         # self.pos += self.vel * self.game.dt
         self.hit_rect.centerx = self.pos.x
         collide_with_walls(self, self.game.all_walls, 'x')
@@ -193,8 +211,9 @@ class Player(Sprite):
         self.rect.center = self.hit_rect.center
         self.pickup_ball()
         if self.held_ball:
-            self.held_ball.pos = vec(self.pos.x - TILESIZE, self.pos.y)
+            self.held_ball.pos = vec(self.pos.x + self.direction*TILESIZE, self.pos.y) #sets the ball's position to the player's position + whatever direction the player is facing plus a little more so the ball is infront of the player, this is to show that the player is in possession of the ball
             self.held_ball.rect.center = self.held_ball.pos
+        
         
 
 
@@ -371,7 +390,7 @@ class Soccerball(Sprite):
         ]
 
     def update(self):
-        if self.held:   
+        if not self.held:   
             self.vel = vec(0,BALL_GRAV)
             self.rect.center = self.pos
             self.pos += self.vel * self.game.dt
@@ -380,3 +399,18 @@ class Soccerball(Sprite):
             self.hit_rect.centery = self.pos.y
             collide_with_walls(self, self.game.all_walls, 'y')
             self.rect.center = self.hit_rect.center
+
+class Goalbox(Sprite):
+    def __init__(self, game, x, y):
+            self.groups = game.all_sprites, game.all_goalboxes
+            Sprite.__init__(self, self.groups)
+            self.game = game
+            self.spritesheet = Spritesheet(path.join(self.game.img_dir, "spritesheet.png"))
+            self.image = self.spritesheet.get_image(TILESIZE*72,0,TILESIZE, TILESIZE)
+            self.image = pg.transform.scale(self.image, (TILESIZE*3,TILESIZE*3.2))
+            self.rect = self.image.get_rect()
+            self.vx, self.vy = 0,0
+            self.x = x*TILESIZE
+            self.y = y*TILESIZE
+            self.rect.x = self.x
+            self.rect.y = self.y

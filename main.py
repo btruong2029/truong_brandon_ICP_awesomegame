@@ -72,6 +72,7 @@ class Game: #initializing class Game
         self.all_coins = pg.sprite.Group()
         self.all_particles = pg.sprite.Group()
         self.all_balls = pg.sprite.Group()
+        self.all_goalboxes = pg.sprite.Group()
         
 
  # adds the classes to the game, or where all of them get instantiated into the game
@@ -93,6 +94,10 @@ class Game: #initializing class Game
             for col, tile in enumerate(tiles):
                 if tile == "S":
                     Soccerball(self, col, row)        
+        for row, tiles in enumerate(self.map.data):
+            for col, tile in enumerate(tiles):
+                if tile == "G":
+                    Goalbox(self, col, row)        
 
         # adds looping audio                    
         pg.mixer.music.load(path.join(self.snd_dir, "Intro Theme.mp3"))
